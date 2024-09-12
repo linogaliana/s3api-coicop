@@ -27,4 +27,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: linogaliana/s3api-coicop:latest
+          tags: linogaliana/s3api-coicop:v0.0.1
