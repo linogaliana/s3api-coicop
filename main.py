@@ -15,9 +15,7 @@ import s3fs
 
 BUCKET = "projet-budget-famille"
 
-fs = s3fs.S3FileSystem(
-    client_kwargs={"endpoint_url": "https://minio.lab.sspcloud.fr"}
-)
+fs = s3fs.S3FileSystem(client_kwargs={"endpoint_url": "https://minio.lab.sspcloud.fr"})
 
 
 class ProductData(BaseModel):
@@ -57,7 +55,6 @@ app.add_middleware(
 )
 
 
-
 def path_to_url_preview(path):
     # Base URL
     base_url = "https://datalab.sspcloud.fr/data-explorer?source="
@@ -73,13 +70,16 @@ async def create_item(product: ProductData):
 
     now = datetime.now()
     day = now.strftime("%Y-%m-%d")
-    path = f"{BUCKET}/data/output-annotation/{day=}".replace("'","")
+    path = f"{BUCKET}/data/output-annotation/{day=}".replace("'", "")
 
     try:
         existing_files = fs.ls(path)
         index_max_annot = int(
             pd.Series(
-                [int(re.search(r'annot(\d+)', files).group(1)) for files in existing_files],
+                [
+                    int(re.search(r"annot(\d+)", files).group(1))
+                    for files in existing_files
+                ],
             ).max()
         )
         index_max_annot += 1
@@ -95,7 +95,4 @@ async def create_item(product: ProductData):
     with fs.open(path_s3, "wb") as f:
         df.to_parquet(f)
 
-    return {
-        "filename": path_s3,
-        "preview": path_to_url_preview(path_s3)
-    }
+    return {"filename": path_s3, "preview": path_to_url_preview(path_s3)}
