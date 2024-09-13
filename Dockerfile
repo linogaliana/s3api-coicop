@@ -1,10 +1,18 @@
-FROM ubuntu:22.04
-# Install Python
-RUN apt-get -y update && \
-    apt-get install -y python3-pip
-# Install project dependencies
+FROM inseefrlab/onyxia-python-minimal:py3.10.9
+
+# set current work dir
+WORKDIR /formation-mlops
+
+# copy project files to the image
+COPY --chown=${USERNAME}:${GROUPNAME} . .
+
+# install all the requirements and import corpus
 COPY requirements.txt .
-RUN pip install -r requirements.txt
 COPY main.py .
-CMD ["uvicorn api.main:app --reload --host \"0.0.0.0\" --port 5000"]
+
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+
+# launch the unicorn server to run the api
+EXPOSE 8000
+CMD ["uvicorn", "main:app",  "--proxy-headers", "--host", "0.0.0.0", "--port", "8000"]
 
