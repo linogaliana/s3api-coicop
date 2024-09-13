@@ -2,3 +2,4 @@ fastapi
 uvicorn
 pandas
 s3fs
+pyarrow
